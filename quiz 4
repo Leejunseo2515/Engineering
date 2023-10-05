@@ -1,0 +1,26 @@
+import processing.net.*;
+Server server;
+void setup() {
+  size(200, 200);
+  server = new Server(this, 12345);
+}
+void draw() {
+  background(backgroundColor);
+  Client client = server.available();
+  if (client != null) {
+    String data = client.readString().trim();
+    if (data.equals("1")) {
+      backgroundColor = color(0, 0, 255);
+    } else if (data.equals("0")) {
+      backgroundColor = color(255, 0, 0);
+    }
+    client.stop();
+  }
+}//processing code
+-------------------------------------------------------
+//mit app inventor component
+{Web : ipconfig http://(ipv4):12345
+ 
+when Button 1.Click do call Web1. PostText text[1]
+when Button 2.Click do call Web1. PostText text[0]
+when Screen1. ErrorOccurred do set Screen1. Title to get component
