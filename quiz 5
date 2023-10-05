@@ -1,0 +1,91 @@
+// MIT app inventor component
+when Button1.Click
+  Web1.Url = "http:/(ipv4)/on"
+  Web1.Get()
+
+when Button2.Click
+  Web1.Url = "http://(ipv4)/off"
+  Web1.Get()
+
+when Web1.GotText
+  set Sound1.Volume to 50
+  if Web1.ResponseContent = "1" then
+    Sound1.PlayNote(65, 500) // 도 (1옥타브)
+  else if Web1.ResponseContent = "2" then
+    Sound1.PlayNote(67, 500) // 레
+  else if Web1.ResponseContent = "3" then
+    Sound1.PlayNote(69, 500) // 미
+  else if Web1.ResponseContent = "4" then
+    Sound1.PlayNote(71, 500) // 파
+  else if Web1.ResponseContent = "5" then
+    Sound1.PlayNote(72, 500) // 솔
+  else if Web1.ResponseContent = "6" then
+    Sound1.PlayNote(74, 500) // 라
+  else if Web1.ResponseContent = "7" then
+    Sound1.PlayNote(76, 500) // 시
+  else if Web1.ResponseContent = "8" then
+    Sound1.PlayNote(77, 500) // 6옥타브 도
+-----------------------------------------------------------
+import processing.serial.*;
+
+Serial port; 
+int ledPin = 7;
+int speakerPin = 4;
+
+void setup() {
+  size(200, 200);
+  port = new Serial(this, "COM3", 9600);
+  port.bufferUntil('\n');
+}
+
+void draw() {
+  background(255);
+}
+
+void keyPressed() {
+  if (key == '1') {
+    port.write("on\n");
+  } else if (key == '0') {
+    port.write("off\n");
+  } else if (key >= '1' && key <= '8') {
+    int note = key - '0';
+    port.write(str(note) + "\n");
+  }
+} //processing code
+---------------------------------------------------------------
+#include <Servo.h>
+Servo myservo;
+#define LED_PIN 7
+#define SPEAKER_PIN 4
+void setup() {
+  pinMode(LED_PIN, OUTPUT);
+  pinMode(SPEAKER_PIN, OUTPUT);
+  myservo.attach(9);
+  Serial.begin(9600);
+}
+void loop() {
+  if (Serial.available() > 0) {
+    String command = Serial.readStringUntil('\n');
+    if (command == "on") {
+      digitalWrite(LED_PIN, HIGH);
+    } else if (command == "off") {
+      digitalWrite(LED_PIN, LOW);
+    } else {
+      int note = command.toInt();
+      playNote(note);
+    }
+  }
+}
+
+void playNote(int note) {
+  int frequencies[] = {523, 587, 659, 698, 783, 880, 987, 1046};
+  if (note >= 1 && note <= 8) {
+    int frequency = frequencies[note - 1];
+    tone(SPEAKER_PIN, frequency);
+    delay(500); // 소리를 재생할 시간
+    noTone(SPEAKER_PIN);
+  }
+} //arduino code
+
+
+
